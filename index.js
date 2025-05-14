@@ -9,7 +9,7 @@ app.use(express.json());
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.anxcgnq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -25,6 +25,13 @@ async function run() {
   try {
 
     const petsCollection = client.db("petsDatabase").collection("petsHouse")
+
+    app.get("/pets/:id", async (req, res) => {
+      const id = req.params.id
+      const cursor = {_id: new ObjectId(id)}
+      const result = await petsCollection.findOne(cursor)
+      res.send(result)
+    })
 
     app.get("/pets", async (req, res) => {
       const result = await petsCollection.find().toArray()
